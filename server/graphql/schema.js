@@ -65,15 +65,34 @@ const schema = buildSchema(
   },
   type Query {
     people: [Person]!
+    person(id: Int!): Person!
+  }
+  type Mutation {
+    deletePerson(id: Int!): Int
   }
   `
 );
 
 const root = {
   // Has to match existing property in type Query in the schema
+
+  // get all people
   people() {
     const formatted = users.map(val => new Person(val));
     return formatted;
+  },
+  // get single person
+  person({ id }) {
+    const selected = users.filter(val => val.id === id)[0];
+    if (!selected) {
+      throw new Error(`No person with id of ${id}.`);
+    }
+    return new Person(selected);
+  },
+  // delete person
+  deletePerson({ id }) {
+    users = users.filter(val => val.id !== id);
+    return id;
   }
 };
 
